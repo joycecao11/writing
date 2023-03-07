@@ -1,0 +1,75 @@
+%Paragraph 1: Motivation. At a high level, what is the problem area you are working in and why is it important? It is important to set the larger context here. Why is the problem of interest and importance to the larger community?
+
+\notetp{I haven't tweaked anything as this is a exercise, but double check your English grammar. [mine is not great either, but...]}
+
+\notetp{This is much better than last time. You still don't need to insist as much on re-installing the kernel :p, but it is much better.}
+
+
+\notetp{I think you want to simplify this paragraph. What are they key thing you want to say?}
+As data processing size 
+\notesyl{what is data processing size?}
+in modern computing increases significantly, many efforts has been done to improve computational performance by construct high-performance computing hardware to increase bandwidth and capacity in hardware, which, however, makes the processor-memory performance gap wider.
+\notetp{I am not sure what the previous sentence is trying to say.d}
+\notejy{Same opinion as Thomas. The first sentence is a bit unclear to me. I could not understand why constructing high-performance computing hardware will makes the processor-memory performance gap wider. }
+Other work focuses on memory access latency 
+\notejy{Are you saying "other work focuses on reducing memory access latency by ..."?}
+by building deeper memory hierarchy or scaling to larger caches to move needed data closer to processors is restricted since multicore processor scaling power is limited \cite{dark-silicon}.
+\notejy{I don't understand the descriptions in subordinate clause.}
+\notesyl{I don't understand anything up until here}
+Moreover, making improvements in hardware is usually more complicated and time consuming.
+\notejy{Could you provide some reasons why it is complicated and time consuming to improve hardware?}
+Instead, these bottlenecks inspire numerous optimization techniques such as ideas in designing more efficient software algorithms in prefetching. Prefetching technique helps discover and summarize the memory access patterns and move the data that it predicts to be the next most probable accessed into caches in advance.
+It aims to reduce the cache misses and thus, lower the memory access latency.
+Current common prefetching techiques includes hardware-based prefetching which takes advantage of a specific hardware to detect some special features \cite{linearlize-irregular-memory} and compiler-based prefetchers which instrument the source code to gain memory access insights with the help of statically analysis \cite{Compiler_Orchestrated}. \notema{My general comment will be regarding sentence structure. All the sentences are verbose and usually takes multiple reading to understand. I think you can break the sentences up to increase readability.}
+
+\notetp{What is this paragraph trying to say?}
+Despite external hardware-based prefetching techniques,
+\notesyl{what is external hardware-based prefetching?}
+\notejy{Why are external hardware-based prefetching techniques suddenly mentioned here?}
+previous work is also interested in improving caching, prefetching, and paging baseline policies in the operating systems \cite{Leap, spec-paging, Lynx}. However, there are limitations in making such improvements in OS such as Linux kernel.
+
+%Paragraph 2: What is the specific problem considered in this paper? This paragraph narrows down the topic area of the paper. In the first paragraph you have established general context and importance. Here you establish specific context and background.
+
+One of the challenges is that there is no single policy can outperform all other available policies for all programs running in the kernel.
+It has been shown that different programs running in the kernel can be classified to fit into different prefetching algorithms based on their arithmetic instructions which lead to cache misses \cite{Classify_prefetch}.
+For example, a simple stride-based prefetcher is suitable for an application whose cache misses mostly happen when addition instructions of memory addresses are executed.
+However, if addition-missing instructions only happen occasionally, simple stride-based prefetching algorithms won't help much.
+Moreover, among existing research work with various innovative prefetchers, it is obvious that each prefetcher is designed to target a specific problem and thus used to solve the bottleneck related to that problem.
+As a result, although lots of prefetching solutions available, it is not surprising that Linux kernel only focuses on simple spatial patterns which beneficial for general sequential data accesses \cite{kernel-prefetch-cache-replace}. \notetp{why? Is it because on average it works well?}
+Consequently, there is no doubt that the memory access latency can be improved if we can run different applications with its own beneficial prefetching algorithms in Linux kernel.
+
+However, it is not easy to embed multiple prefetching algorithms into Linux kernel.
+In prior work where researchers try to test and classify multiple prefetching combination techniques, they either use a special hardware which itself is flexible to support multiple prefetching strategies \cite{cross-prefetch-schedule} or implements separate kernels to achieve it \cite{Classify_prefetch}. Switching kernels on machines makes the deploying process of prefetching algorithms too complicated.
+It is not worth changing the whole kernel because of the relative small size of modified prefetching code.
+Most of prefetching solutions do not have complex algorithms because the trade-off of over-complicated algorithms causes more time complexity and thus can deteriorate its performance \cite{Classify_prefetch}.
+\notesyl{is complicated prefetching algorithm not efficient overall or is it because it was evaluated on a not-so-suitable application?}\notema{Same Question.}
+\notenb{I think I understand the problem from the previous two paragraphs. It would help to strengthen your introduction if the first paragraph that establishes context was more clear. Maybe it would help to think about why this problem is important. What would be the outcome if your project succeeded and why would it matter?}
+
+To address those concerns, the support of \ebpf in the Linux kernel has drawn much our attention. 
+\ebpf is a Linux framework which allows us to hook customized functionalities in kernel without changing its code or loading other kernel modules \cite{ebpf}. It is widely used in terms of data tracing, network filtering, and security monitoring. By leveraging \ebpf, instead of modifying kernel's prefetching code, we can offload the implementation into \ebpf functions. 
+\notesyl{do you mean \ebpf programs?}
+As a result, there is no need to reboot kernel and can switch different implementations flexibly. For example, existing work shows the idea of migrating a scheduling algorithm using \ebpf to achieve dynamic switches of scheduling policies for different types of workloads \cite{ghOSt_ebpf}. Similarly, prefetching can also be implemented in \ebpf and be switched easily.
+\notejy{Why don't you consider Linux hooking mechanism? With Linux hooks, you just need to load a module for prefetching. You do not need to reboot or re-compile the kernel. What are the benefits of \ebpf compared with Linux hooks?}
+\notenb{I think by the end of this paragraph it is still not entirely clear why eBPF is the solution, especially if a reader does not know what eBPF is. }
+
+\notetp{Ok, do you have an idea on how to do this? At this point it is not super clear. I would suggest to focus on you described before for the RPE.}
+In addition to mitigating the burden of installing the whole kernel, \ebpf can also help reduce the unnecessary overhead introduced by kernel. Previous work shows that in storage accesses, kernel can not simply be bypassed due to its fine-grained information and the powerful ability to share capabilities among applications. However, hooking storage access functions using \ebpf deeply into kernel can reduce overhead from copying data and context switches for redundant operations \cite{XRP, BPF_storage}. In the same way, \ebpf gives us hope in reducing latency in userspace prefetching while being able to access more privileged dynamic information such as cache hit count that can only be obtained from kernel\textcolor{red}{[TODO: need more reference]}. 
+
+% Paragraph 3: "In this paper, we show that ...". This is the key paragraph in the intro - you summarize, in one paragraph, what are the main contributions of your paper given the context you have established in paragraphs 1 and 2. What is the general approach taken? Why are the specific results significant? This paragraph must be really really good. If you can't "sell" your work at a high level in a paragraph in the intro, then you are in trouble. As a reader or reviewer, this is the paragraph that I always look for, and read very carefully.
+
+% You should think about how to structure this one or two paragraph summary of what your paper is all about. If there are two or three main results, then you might consider itemizing them with bullets or in test (e.g., "First, ..."). If the results fall broadly into two categories, you can bring out that distinction here. For example, "Our results are both theoretical and applied in nature. (two sentences follow, one each on theory and application)"
+
+In this paper, we introduce \system to improve Linux's prefetching functionalities by extending \ebpf framework to support multiple prefetchers. 
+\begin{itemize}
+    \item we experiment and implement a new \ebpf program type to support several existing prefetching algorithms.
+    \item we summarize the resources needed from Linux kernel to generalize the framework to support more state-of-art prefetchers.
+    \item we perform evaluation on our \system to show the performance improvement.
+\end{itemize}
+
+% Paragraph 4: At a high level what are the differences in what you are doing, and what others have done? Keep this at a high level, you can refer to a future section where specific details and differences will be given. But it is important for the reader to know at a high level, what is new about this work compared to other work in the area.
+
+Our work is the first one tries to provide a framework in Linux kernel to generalize and support multiple prefetching algorithms for applications using \ebpf.
+
+% Paragraph 5: "The remainder of this paper is structured as follows..." Give the reader a roadmap for the rest of the paper. Avoid redundant phrasing, "In Section 2, In section 3, ... In Section 4, ... " etc.
+
+

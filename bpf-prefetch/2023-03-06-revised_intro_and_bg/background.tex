@@ -1,0 +1,51 @@
+In this section, we introduce the \ebpf framework and Linux prefetching in detail.
+
+% ebpf
+\subsection{eBPF}
+
+\notetp{Imagine a reader who knows nothing about \ebpf. Do you think this sufficient for them to understand? What aspect do you want them to really understand for your work?}
+
+Extended Berkeley Packet Filter(eBPF) is a framework that allow users to flexibly run customized sandbox programs in privileged mode in kernel.
+\notejy{Is eBPF originally designed to run customized sandbox programs in privileged mode in kernel?}
+It is an extended version of Berkeley Packet Filter(BPF) which is mainly used to performance packet filtering processing.\notema{You mean measure?}
+\ebpf draws much attention because of its high-performance and guaranteed security with its JIT compiler and verifier.
+Current common \ebpf programs span in a wide rage of areas.
+It is used in tracing networking \cite{bpftrace}, load-balancing \cite{Cilium, katran}, increasing security observability \cite{secure-namespace}, and bypassing high-overhead kernel framework \cite{BPF_storage, XRP}.
+Functions are offloaded into userspace's programs where it is easy to modify and change the behaviours.
+\ebpf attaches hooks for a program type inside of Linux kernel.
+It is event-driven as when the hooks inside of kernel functions are triggered, the offloaded \ebpf sandbox programs will be called as callback functions.
+Data can be shared between userspace programs and Linux kernel, thus, hooks can trigger \ebpf programs with restricted kernel information.
+\notejy{I couldn't get the causal logics in the previous sentence.}
+In this way, by implementing prefetcher into \ebpf programs, we can dynamically change algorithms without switching kernels.
+\notesyl{it is not entirely clear what aspects of \ebpf allow you to customize prefetching policies}
+
+
+% Linux kernel prefetching
+\subsection{Prefetching in Linux}
+
+\notetp{Ok this is good and there is good idea. In particular as far as the motivation goes. Could you discuss in a bit more details when things work and when they don't? Why? When other algorithms work better? Why? etc.}
+
+Linux kernel prefetching algorithm is mainly beneficial from sequential memory access, and thus, can't adopt to more complex memory access patterns \cite{kernel-prefetch-cache-replace}.
+\notesyl{why?}
+In Linux's readahead function, it keeps track of the number of cache hits between two page faults.
+The count number is then used to dynamically change the number of pages (window size) that kernel will prefetch next time.
+Giving the window size, Linux kernel only consider prefetching pages in consecutive blocks in swap device.
+By considering only the last two page faults, Linux kernel would either not able to confidently scale to have larger window size quickly to further increase cache hits if sequential accesses is correct or miss the potential larger temporal access patterns and thus introduce cache pollution with useless pages.
+\notejy{It would be good to spilt the contents above into multiple sentences.}
+An experiment shows in the situation that a stride access pattern that has stride size being larger than the window size, Linux's default prefetcher has a significant performance loss \cite{Leap}.
+Linux community has done work to improve the readahead function.
+First, it implements prefetching in virtual memory area(vma) abstraction.
+vma is used to track process-level memory mapping and divides virtual memory regions that have different backing storages.
+In this case, each vma has its own window size to reflect the idea that each vma should have different access patterns \cite{VMA_swap}.
+Second, it adds cluster-level prefetching along with page-level prefetching.
+In different situations, Linux kernel can choose to prefetch more data by switching to bringing in several clusters instead of pages.
+However, these work could not resolve the problem that it considers sequencial access only and is too simple by only focusing on the last two page faults.
+
+\notetp{Ok, for your RPE this is going to be very important. Do you think it is worthwhile to add a figure to explain it? Or use a bit more real estate to discuss LEAP?}
+
+One of the exisiting work makes effort to improve Linux's prefetching algorithm is Leap \cite{Leap}.
+Leap uses the Boyer-Moore majority vote algorithm to detect the majority access stride pattern within an online ring buffer.
+The ring buffer is dynamically updated with current memory access location and the majority within the ring buffer window is thus dynamically changes.
+The majority in this algorithm is the major memory access stride which is the difference of memory addresses of two memory accesses. Our current goal is to implement this algorithm using \ebpf.
+\notesyl{you say that Leap improves Linux's default prefetching algorithm but what limitations do Leap address? In what aspect is Leap better than the Linux default?}
+\notejy{I am a bit confused after reading the last sentence. In the introduction, you mentioned that single prefetching algorithm does not work well on a system that runs various applications. So, after reading introduction, I guess you want to use \ebpf to build an infrastructure to combine different algorithms all together. However, here you said you will only implement an algorithm using \ebpf, which confuses me. Could explain the motivations and your goals in this project?}\notema{This paragraph is too condensed considering that LEAP is one of the key components of your work. I think you should elaborate this a bit more as well as add explanation regarding its importance and limitations.}

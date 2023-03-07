@@ -1,0 +1,158 @@
+\documentclass[10pt, twocolumn, letterpaper]{article}
+\usepackage{usenix2019_v3}
+
+% \usepackage[utf8]{inputenc}
+% \usepackage[margin=2cm]{geometry}
+\usepackage[english]{babel}
+\usepackage{graphicx}
+\usepackage{listings}
+\usepackage{xspace}
+\usepackage{xcolor}
+\usepackage{ragged2e}
+\usepackage{pgfgantt}
+\usepackage{flushend}
+\usepackage{multicol}
+\usepackage{multirow}
+% to be able to draw some self-contained figs
+\usepackage{tikz}
+\usepackage{amsmath}
+% inlined bib file
+\usepackage{filecontents}
+
+% \RequirePackage{hyperref}
+% \RequirePackage[hyphens]{url}
+
+% Configure listings
+\lstdefinestyle{customc}{
+	belowcaptionskip=1\baselineskip,
+	breaklines=true,
+	linewidth=\columnwidth,
+	columns=fullflexible,
+	xleftmargin=0.05\columnwidth,
+	xrightmargin=0.05\columnwidth,
+	numbersep = -0.003\columnwidth,
+	language=C,
+	tabsize=2,	
+	showstringspaces=false,
+	basicstyle=\footnotesize\ttfamily,
+	keywordstyle=\bfseries\color{green!40!black},
+	commentstyle=\itshape\color{purple!40!black},
+	identifierstyle=\color{blue},
+	stringstyle=\color{orange},
+}
+
+\lstset{escapechar=@,style=customc}
+
+% For commenting %
+\definecolor{airforceblue}{rgb}{0.36, 0.54, 0.66}
+\definecolor{antiquebrass}{rgb}{0.8, 0.58, 0.46}
+\definecolor{applegreen}{rgb}{0.55, 0.71, 0.0}
+\definecolor{bazaar}{rgb}{0.6, 0.47, 0.48}
+\definecolor{brickred}{rgb}{0.8, 0.25, 0.33}
+\definecolor{cambridgeblue}{rgb}{0.64, 0.76, 0.68}
+\definecolor{chestnut}{rgb}{0.8, 0.36, 0.36}
+\definecolor{darksalmon}{rgb}{0.91, 0.59, 0.48}
+\definecolor{darkchampagne}{rgb}{0.76, 0.7, 0.5}
+
+\newcommand{\notesyl}[1]
+{{\color{darksalmon}[{\bf Soo Yee:} #1]}}
+\newcommand{\notetp}[1]
+{{\color{airforceblue}[{\bf Thomas:} #1]}}
+\newcommand{\notejy}[1]
+{{\color{antiquebrass}[{\bf Jinyuan:} #1]}}
+\newcommand{\notenb}[1]
+{{\color{cambridgeblue}[{\bf Nichole:} #1]}}
+\newcommand{\notesd}[1]
+{{\color{chestnut}[{\bf Sadaf:} #1]}}
+\newcommand{\notemy}[1]
+{{\color{darkchampagne}[{\bf Mayank:} #1]}}
+\newcommand{\notexc}[1]
+{{\color{applegreen}[{\bf Joyce:} #1]}}
+\newcommand{\notema}[1]
+{{\color{brickred}[{\bf Monowar:} #1]}}
+
+% Commands for some frequently used words %
+\newcommand{\ebpf}{eBPF\xspace}
+\newcommand{\ie}{i.e.,\@\xspace}
+\newcommand{\eg}{e.g.,\@\xspace}
+\newcommand{\etal}{et al.\@\xspace}
+\newcommand{\vs}{vs.\@\xspace}
+\newcommand{\cf}{cf.\@\xspace}
+\newcommand{\fig}{Fig.~}
+\newcommand{\ps}{pub\slash sub}
+\newcommand{\etc}{etc.\@\xspace}
+\newcommand{\system}{\texttt{Unnamed Project}\xspace}
+\newcommand{\noindgras}[1]{\noindent{\bf #1}}
+
+
+%-------------------------------------------------------------------------------
+\begin{document}
+%-------------------------------------------------------------------------------
+
+%don't want date printed
+\date{}
+
+% make title bold and 14 pt font (Latex default is non-bold, 16 pt)
+\title{\Large \bf BPF for Prefetching}
+
+
+
+%for single author (just remove % characters)
+\author{
+{\rm Xuechun Cao}\\
+University of British Columbia\\
+% {\rm cxuechun@cs.ubc.ca}
+% \and
+% {\rm Second Name}\\
+% Second Institution
+% copy the following lines to add more authors
+% \and
+% {\rm Name}\\
+%Name Institution
+} % end author
+
+\maketitle
+
+%-------------------------------------------------------------------------------
+% \begin{abstract}
+% %-------------------------------------------------------------------------------
+% Your abstract text goes here. Just a few facts. Whet our appetites.
+% Not more than 200 words, if possible, and preferably closer to 150.
+% \end{abstract}
+
+\section{Introduction}
+\label{sec:introduction}
+\input{introduction.tex}
+
+\section{Background}
+\label{sec:background}
+\input{background}
+
+%---------------------------
+% \begin{figure}
+% \begin{center}
+% \begin{tikzpicture}
+%   \draw[thin,gray!40] (-2,-2) grid (2,2);
+%   \draw[<->] (-2,0)--(2,0) node[right]{$x$};
+%   \draw[<->] (0,-2)--(0,2) node[above]{$y$};
+%   \draw[line width=2pt,blue,-stealth](0,0)--(1,1)
+%         node[anchor=south west]{$\boldsymbol{u}$};
+%   \draw[line width=2pt,red,-stealth](0,0)--(-1,-1)
+%         node[anchor=north east]{$\boldsymbol{-u}$};
+% \end{tikzpicture}
+% \end{center}
+% \caption{\label{fig:vectors} Text size inside figure should be as big as
+%   caption's text. Text size inside figure should be as big as
+%   caption's text. Text size inside figure should be as big as
+%   caption's text. Text size inside figure should be as big as
+%   caption's text. Text size inside figure should be as big as
+%   caption's text. }
+% \end{figure}
+%% %---------------------------
+
+\bibliographystyle{IEEEtran}
+\bibliography{bibliography}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\end{document}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
