@@ -1,0 +1,68 @@
+%Paragraph 1: Motivation. At a high level, what is the problem area you are working in and why is it important? It is important to set the larger context here. Why is the problem of interest and importance to the larger community?
+
+Memory access is one \notejy{of} the most important sources of performance overhead in operating system. 
+\notejy{I don't quite understand this sentence. Do you mean "memory access is one of the most important aspects contributing the performance overhead in operating system"?}
+Computer architects have mitigated this problem by building deeper memory hierarchy to move needed data closer to processors or constructing high-performance computing hardware. 
+\notejy{The problem is not clear here. Why is memory access a problem?}
+However, making improvements in hardware is usually more complicated and time consuming. 
+\notejy{Why? Any reference to support your statement?}
+Instead, lots of ideas in designing more efficient software algorithms have emerged. Prefetching algorithm is one of such solutions to address this problem and there are numerous prefetching research.
+\notetp{Ok I think the intro is at first way too broad, and then becomes super focused. I think you want to scope around memory management/prefecthing from the start.}
+In the existing work, some take advantage of statically \notesd{static} analysis and injection of precomputation access patterns in compilers \cite{Compiler_Orchestrated} and some also want to dynamically detect information 
+\notesyl{what kind of information?}
+by monitoring and add extra functionalities.  \notesd{What kinds of functionality?}
+\notejy{the reference of the second approach?}
+Moreover, the latter requires to modify code in kernel. For example, some research believes that Linux kernel whose default prefetching decision depends only the last two page faults for applications is too problematic, 
+\notema{problematic as in the prefetching decisions are error prone?}
+\notesyl{in what way?}
+\notesd{problematic or causing a high performance overhead?}
+and thus, an alternative prefetcher is implemented in the Linux kernel \cite{VMA_swap, Leap}.
+\notetp{If you want to bring up an example here, you need to explain it fully. You cannot just say it is ``problematic''. Either don't bring up the example or explain it clearly.}
+\notenb{Why is it problematic?}
+\notenb{I think this paragraph should elaborate more on memory access overheads rather than getting into specific details about pre-fetching algorithms and you can save those prefetching details for the next paragraph.}
+\notema{+1 to what Nichole said. The first paragraph of the introduction should not be narrowing down the problem scope.}
+%Paragraph 2: What is the specific problem considered in this paper? This paragraph narrows down the topic area of the paper. In the first paragraph you have established general context and importance. Here you establish specific context and background.
+
+\notetp{I get what you are trying to say, but you need to phrase it differently.}
+However, switching kernels on machines makes the deploying process of prefetching algorithms too complicated. 
+\notejy{Why does switching kernels on machines relate to prefetching?}
+\notesyl{I don't understand the first sentence}
+First, it is not worth changing the whole kernel because of the relative small size of modified prefetching code. Most of prefetching solutions do not have complex algorithms because the trade-off of over-complicated algorithms causes more time complexity and thus can deteriorate its performance \cite{Classify_prefetch}. For example, Leap prefetching algorithm only changes two files related to prefetching and page eviction policy with no more than 1k LoC \cite{Leap}. As a result, overhead of writing a running script, installing dependencies, and even storing all kernel images on machine is even heavier than adding code inside of kernel itself. 
+\notejy{I don't understand the logics here. In the previous sentence, you have explain the trade-off of the prefetching algorithm and give an example with small number of LoC. How is this the \textbf{reason} to show those approaches (writing a running script, installing dependencies, etc.) are heavier than adding codes inside the kernel?}
+\notesd{Are you comparing two different types of overhead here? Adding the code is the overhead of developer/researcher but the dependencies and running is for the user that wants to use the new prefetching algorithm. So isn't it possible for the user to decide the algorithm she wants to use and just use the corresponding kernel? Why do the user need to change the kernel frequently?}
+Secondly, since computers can only run one kernel at a time, 
+\notesyl{not true, virtualization runs multiple copies of kernel on the same machine}
+frequent installation and rebooting processes of kernels make it inflexible when multiple versions of prefetching algorithms are compared or potentially will be used. 
+\notejy{If you only care about the inflexibility of comparing different algorithms, I don't think that can be the problem. There are several ways to address it, for example,  one of which can use multiple hosts to install different kernels for comparison.}
+\notema{The second point is a bit vague and requires a bit elaboration I think.}
+
+There are some thoughts about switching functionalities such as scheduling and prefetching in kernel based on distinguish features of applications. While this can be done by pushing algorithms into application level, more privileged dynamic information such as cache hit count can only be obtained from kernel.
+\notetp{I think those last two sentences warrant citations.}
+\notenb{It's not entirely clear to me whether you are outlining the concerns with leap or another prefetching mechanism? Do these limitations apply to all current prefetchers?}
+
+To address those concerns, the support of \ebpf in the Linux kernel has drawn much our attention. \ebpf is a Linux framework which allows us to hook customized functionalities in kernel without changing its code or loading other kernel modules \cite{ebpf}. It is widely used in terms of data tracing, network filtering, and security monitoring. By leveraging \ebpf, instead of modifying kernel's prefetching code, we can offload the implementation into \ebpf functions. 
+As a result, there is no need to reboot kernel and can switch different implementations flexibly. For example, existing work shows the idea of migrating a scheduling algorithm using \ebpf to achieve dynamic switches of scheduling policies for different types of workloads \cite{ghOSt_ebpf}. Similarly, prefetching can also be implemented in \ebpf and be switched easily.
+\notema{When do you make the decisions of switching prefetcher in runtime?}
+\notejy{The kernel already has its own prefetching algorithm. If you devise a new prefetching algorithm using \ebpf, will there be any conflict between kernel algorithm and your algorithm?}
+
+In addition to mitigating the burden of installing the whole kernel, \ebpf can also help reduce the unnecessary overhead introduced by kernel. Previous work shows that in storage accesses, kernel can not simply be bypassed due to its fine-grained information and the powerful ability to share capabilities among applications.
+\notejy{Do you mean some access control studies using \ebpf here? Would be good to provide some references.}
+ However, hooking storage access functions using \ebpf deeply into kernel can reduce overhead from copying data and context switches for redundant operations \cite{XRP, BPF_storage}. In the same way, \ebpf gives us hope in reducing latency in prefetching \textcolor{red}{[TODO: need more reference]}. 
+\notetp{Ok this paragraph is not super clear.}
+\notenb{I'm not exactly sure what you mean by deeply into kernel. Also it's not exactly clear to me how you would implement prefetching in eBPF. Like what would the eBPF program do that would improve prefetching?}
+\notesd{I thought you can just run additional functions using ebpf, I didn't understand how it can help in reducing the overhead? cause anyways, you will run the kernel code normally right? }
+% Paragraph 3: "In this paper, we show that ...". This is the key paragraph in the intro - you summarize, in one paragraph, what are the main contributions of your paper given the context you have established in paragraphs 1 and 2. What is the general approach taken? Why are the specific results significant? This paragraph must be really really good. If you can't "sell" your work at a high level in a paragraph in the intro, then you are in trouble. As a reader or reviewer, this is the paragraph that I always look for, and read very carefully.
+
+% You should think about how to structure this one or two paragraph summary of what your paper is all about. If there are two or three main results, then you might consider itemizing them with bullets or in test (e.g., "First, ..."). If the results fall broadly into two categories, you can bring out that distinction here. For example, "Our results are both theoretical and applied in nature. (two sentences follow, one each on theory and application)"
+
+In this paper, we introduce \system to improve Linux
+s prefetching functionalities by extending \ebpf framework. First, we implement different prefetching algorithms using \ebpf. \textcolor{red}{[TODO: ongoing goals]}
+\notetp{Your first is probably the last. The first thing you will do is implement an \ebpf framework to support prefecthing, then you (re)-implement a number of solution from the literature, then you may want to show that a single system can support multiple applications with different policies improving their performance or some such.}
+
+% Paragraph 4: At a high level what are the differences in what you are doing, and what others have done? Keep this at a high level, you can refer to a future section where specific details and differences will be given. But it is important for the reader to know at a high level, what is new about this work compared to other work in the area.
+\textcolor{red}{[TODO: differences with existing work]}
+
+% Paragraph 5: "The remainder of this paper is structured as follows..." Give the reader a roadmap for the rest of the paper. Avoid redundant phrasing, "In Section 2, In section 3, ... In Section 4, ... " etc.
+\textcolor{red}{[TODO: paper structure and contribution]}
+
+

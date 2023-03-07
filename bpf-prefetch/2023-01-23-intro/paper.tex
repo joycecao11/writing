@@ -1,0 +1,96 @@
+\documentclass[10pt, twocolumn, letterpaper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\usepackage[margin=2cm]{geometry}
+\usepackage{graphicx}
+\usepackage{listings}
+\usepackage{xspace}
+\usepackage{xcolor}
+\usepackage{ragged2e}
+\usepackage{pgfgantt}
+\usepackage{flushend}
+\usepackage{multicol}
+\usepackage{multirow}
+
+\RequirePackage[hyphens]{url}
+\RequirePackage{hyperref}
+
+% Configure listings
+\lstdefinestyle{customc}{
+	belowcaptionskip=1\baselineskip,
+	breaklines=true,
+	linewidth=\columnwidth,
+	columns=fullflexible,
+	xleftmargin=0.05\columnwidth,
+	xrightmargin=0.05\columnwidth,
+	numbersep = -0.003\columnwidth,
+	language=C,
+	tabsize=2,	
+	showstringspaces=false,
+	basicstyle=\footnotesize\ttfamily,
+	keywordstyle=\bfseries\color{green!40!black},
+	commentstyle=\itshape\color{purple!40!black},
+	identifierstyle=\color{blue},
+	stringstyle=\color{orange},
+}
+
+\lstset{escapechar=@,style=customc}
+
+% For commenting %
+\definecolor{airforceblue}{rgb}{0.36, 0.54, 0.66}
+\definecolor{antiquebrass}{rgb}{0.8, 0.58, 0.46}
+\definecolor{applegreen}{rgb}{0.55, 0.71, 0.0}
+\definecolor{bazaar}{rgb}{0.6, 0.47, 0.48}
+\definecolor{brickred}{rgb}{0.8, 0.25, 0.33}
+\definecolor{cambridgeblue}{rgb}{0.64, 0.76, 0.68}
+\definecolor{chestnut}{rgb}{0.8, 0.36, 0.36}
+\definecolor{darksalmon}{rgb}{0.91, 0.59, 0.48}
+\definecolor{darkchampagne}{rgb}{0.76, 0.7, 0.5}
+
+\newcommand{\notesyl}[1]
+{{\color{darksalmon}[{\bf Soo Yee:} #1]}}
+\newcommand{\notetp}[1]
+{{\color{airforceblue}[{\bf Thomas:} #1]}}
+\newcommand{\notejy}[1]
+{{\color{antiquebrass}[{\bf Jinyuan:} #1]}}
+\newcommand{\notenb}[1]
+{{\color{cambridgeblue}[{\bf Nichole:} #1]}}
+\newcommand{\notesd}[1]
+{{\color{chestnut}[{\bf Sadaf:} #1]}}
+\newcommand{\notemy}[1]
+{{\color{darkchampagne}[{\bf Mayank:} #1]}}
+\newcommand{\notexc}[1]
+{{\color{applegreen}[{\bf Joyce:} #1]}}
+\newcommand{\notema}[1]
+{{\color{brickred}[{\bf Monowar:} #1]}}
+
+% Commands for some frequently used words %
+\newcommand{\ebpf}{eBPF\xspace}
+\newcommand{\ie}{i.e.,\@\xspace}
+\newcommand{\eg}{e.g.,\@\xspace}
+\newcommand{\etal}{et al.\@\xspace}
+\newcommand{\vs}{vs.\@\xspace}
+\newcommand{\cf}{cf.\@\xspace}
+\newcommand{\fig}{Fig.~}
+\newcommand{\ps}{pub\slash sub}
+\newcommand{\etc}{etc.\@\xspace}
+\newcommand{\system}{\texttt{Unnamed Project}\xspace}
+\newcommand{\noindgras}[1]{\noindent{\bf #1}}
+
+
+\begin{document}
+
+	\title{\vspace{-1.5cm}BPF for Prefetching}
+	\author{Xuechun Cao}
+	\date{}
+	
+	\maketitle
+	
+	\section{Introduction}
+	\label{sec:introduction}
+	\input{introduction}
+	
+	\bibliographystyle{plain}
+	\bibliography{bibliography}
+
+\end{document}
